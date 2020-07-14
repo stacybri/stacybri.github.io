@@ -1,0 +1,911 @@
+---
+title: "Statistical Performance Indicators: Data Use Text Mining"
+author: 
+  - "SPI Team"
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+<style>
+
+.center2 {
+  margin: 0;
+  position: absolute;
+  top: -80px;
+  right: 0;  
+  width: 800px;
+  height: 800px;
+}
+.center3 {
+  margin: 0;
+  position: absolute;
+  top: -20px;
+  right: 20px;  
+  width: 800px;
+  height: 800px;
+}
+.reduced{
+   font-size: 0.5em;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(kableExtra)
+library(leaflet)
+library(xaringanthemer)
+library(wbggeo)
+library(wbgmaps)
+library(ggthemes)
+library(Hmisc)
+library(plotly)
+library(haven)
+library(httr)
+library(jsonlite)
+library(rsdmx)
+library(here)
+library(ggrepel)
+
+style_mono_accent(base_color = "#009FDA",
+                  title_slide_background_color = 'white',
+                  title_slide_text_color = '#002244',
+                  title_slide_background_image = 'WB_logo.png',
+                  title_slide_background_size = '7',
+                  title_slide_background_position = 'bottom 25px right 25px;',
+                  text_font_google = google_font('Roboto'),
+                  text_font_size = '24px',
+                  
+                  )
+
+#load useful common files:
+dir <- here()
+
+
+```
+
+
+
+# Introduction
+
+- Goal is to examine the use of text mining of National Development Plans (NDPs) & National Poverty Reduction Strategies for the SPI Data Use dimension    
+
+- In this presentation, will discuss:   
+  - Source for National Development Plan (FAOLEX)   
+  - Dictionary based approach for text mining   
+  - Initial results from text mining NDPs   
+  
+- Methods and data rely heavily on Paris21 approach to text mining
+
+---
+
+# Background on Data Use Dimension
+
+- Indicator intended to be Proxy for the intensity of use of official statistics by each respective user segment in country. 
+
+Data Use dimension contains 5 indicators:   
+  - Data use by national legislature    
+  - Data use by national executive branch   
+  - Data use by civil society   
+  - Data use by academia    
+  - Data use by international organizations   
+
+---
+# Data Use Indicator Methodology
+
+-  Indicator for each of 5 areas is formed by:   
+  1.	Searches the site for references to keywords related to each SDG goal     
+  2.	Searches the site for the subset of references that also include the word statistics    
+  3.	Calculates the ratio between the two
+
+- Algorithm captures density of discussion of each topic in each organization assessed 
+
+---
+# Dictionary Approach to Text Mining
+
+```{r keywords, include=FALSE}
+
+english_keywords_df <- read_csv(paste(dir, "/Data/english_keywords.csv", sep=""))
+
+```
+
+
+- Paris21 has developed set of text mining tools for analyzing NDPs   
+- Created dictionary of `r  nrow(english_keywords_df)` search terms related to different topic areas
+- I categorized keywords into `r length(unique(english_keywords_df$topic))` topic areas
+
+---
+.center3[
+```{r keywords2, echo=FALSE, fig.height=10, fig.width=12, message=FALSE, warning=FALSE}
+
+# SDG word plot
+ggplot(data=english_keywords_df, aes(as.factor(topic))) +
+  geom_histogram(stat='count') +
+  stat_count(aes(y=..count..,label=..count..),geom="text",hjust=-.5) +
+  coord_flip() +
+  theme_bw() +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  ggtitle(str_wrap("Counts of the Number of Keywords by Overall Topic Area",90)) +
+  labs(x='Topic')
+
+
+
+```
+]
+
+---
+# Data Sources for NDPs
+
+```{r faolex, include=FALSE}
+
+
+load(paste(dir,"/Data/documentInfoNew Agri.Rdata", sep=""))
+
+#rename dataframe with document info
+documentInfo <- documentInfoNew
+
+#merge with WB compatible country codes
+ccodes <- read_csv(file=paste(dir, "/Data/FAOSTAT_data_5-1-2020_country_codes.csv", sep="")) %>%
+  as_tibble(.name_repair='universal') %>%
+  mutate(iso3c=ISO3.Code) %>%
+  select(Country, iso3c) %>%
+  group_by(Country, iso3c) %>%
+  summarise_all(~first(.))
+
+documentInfo <- documentInfo %>%
+  mutate(Country = case_when(
+    Country=="Venezuela, Boliv. Rep. of" ~ "Venezuela (Bolivarian Republic of)",
+    Country=="Lao, People's Dem. Rep." ~ "Lao People's Democratic Republic",
+    Country=="China" ~ "China, mainland",
+    Country=="Moldova, Republic of" ~ "Republic of Moldova",
+    Country=="Tanzania, Un. Rep. of" ~ "United Republic of Tanzania",
+    Country=="Czech Republic" ~ "Czechia",
+    Country=="CÃ´te d'Ivoire" ~ "Côte d'Ivoire",
+    Country=="Iran, Islamic Republic of" ~ "Iran (Islamic Republic of)",
+    Country=="Micronesia, Fed. States" ~ "Micronesia (Federated States of)",
+    Country=="Palestinian Authority"  ~ "Palestine",
+    Country=="Congo, Dem. Rep. of"  ~ "Democratic Republic of the Congo",
+    Country=="Korea, Dem. People's Rep." ~ "Democratic People's Republic of Korea",
+    Country=="Korea, Republic of"  ~ "Republic of Korea",
+    TRUE ~ Country
+  )) %>% # fix some broken country names
+  left_join(ccodes) %>%
+  select(-Country)
+  
+#merge with official world bank metadata
+country_metadata <- wbstats::wbcountries()
+
+documentInfo <- documentInfo %>%
+  left_join(country_metadata) %>%
+  select(colnames(country_metadata), everything())
+
+#do some basic cleaning
+documentInfo <- documentInfo %>%
+  mutate(Language.of.document=str_to_lower(Language.of.document),
+         Type.of.text=str_to_lower(Type.of.text),
+         Main.area=str_to_lower(Main.area),
+         Language.of.document=str_replace_all(Language.of.document,'[[:punct:]]',''),
+         Type.of.text=str_replace_all(Type.of.text,'[[:punct:]]',''),
+         Main.area=str_replace_all(Main.area,'[[:punct:]]',''))
+
+#keep just national policy and poverty reduction documents
+documentInfo <- documentInfo %>%
+  filter(grepl("national development", Main.area))
+
+#just keep english, french, and spanish documents for now
+documentInfo <- documentInfo %>%
+  filter(grepl("english|french|spanish|arabic|russian|portuguese|swedish", Language.of.document)) %>%
+  filter(!is.na(Language.of.document))
+
+# keep just since 2010
+documentInfo <- documentInfo %>%
+  filter(year>=2010)
+
+load(paste(dir, "/Data/NDP_corpus.RData", sep=""))
+
+
+```
+
+
+- Paris21 used the FAOLEX database:   
+  - Database of national legislation, policies and other   
+  - Updated with an average of 8,000 new entries per year   
+  - **Includes `r nrow(documentInfo)` NDPs since 2010 from `r length(unique(documentInfo$country))` Countries**   
+  - Limited number of documents per year
+  
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=8}
+
+faolex_yrs <- documentInfo %>% group_by(year) %>% summarise(n=n()) %>% ungroup()
+
+ggplot(faolex_yrs, aes(x=year, y=n, group=1)) +
+  geom_point() +
+  geom_path() +
+  theme_bw() + 
+  labs(y='Number of Documents') +
+  ggtitle('Total Number of NDPs per Year in FAOLEX database Across All Countries')
+
+```
+
+
+---
+
+.center2[
+```{r faolex_map, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14, fig.width=14}
+
+# load data
+#Now map the result
+quality = "high"
+maps <- wbgmaps::wbgmaps[[quality]]
+
+
+  
+  faolex_map <- documentInfo %>%
+    group_by( country) %>%
+    summarise(across(everything(),first)) %>%
+    mutate(data_available=TRUE) %>%
+    right_join(country_metadata) %>%
+    mutate(data_available=if_else(is.na(data_available), FALSE, data_available)) 
+  
+  
+   ggplot() +
+    geom_map(data = faolex_map, aes(map_id = iso3c, fill = data_available), map = maps$countries) + 
+    geom_polygon(data = maps$disputed, aes(long, lat, group = group, map_id = id), fill = "grey80") + 
+    geom_polygon(data = maps$lakes, aes(long, lat, group = group), fill = "white")  +
+     geom_path(data = maps$boundaries,
+               aes(long, lat, group = group),
+               color = "white",
+               size = 0.1,
+               lineend = maps$boundaries$lineend,
+              linetype = maps$boundaries$linetype) +
+    scale_x_continuous(expand = c(0, 0), limits = standard_crop_wintri()$xlim) +
+    scale_y_continuous(expand = c(0, 0), limits = standard_crop_wintri()$ylim) +
+    scale_fill_brewer(
+      name='Data Available',
+      palette='Paired',
+      na.value='blue'
+    ) +
+    coord_equal() +
+    theme_map(base_size=12) +
+    labs(
+      title=str_wrap('Availability of National Development Plan or Poverty Reduction Plan Documents by Country since 2010 from FAOLEX',150),
+      caption = 'Source: FAOLEX'
+    )
+
+
+
+
+
+```
+]
+
+---
+# Text Mining
+
+- Using set of dictionary terms, we can look for sentences in NDPs containing these terms   
+- Then we can check to see if a number is cited in that sentence, as a measure of data use    
+- As an example going forward, we will consider the "National Strategic Development Plan 2014-2018" from Cambodia
+
+```{r examples, include=FALSE}
+
+listReadPDFs = documentInfo$X...PDF.file
+
+listReadPDFs = c('cam145554.pdf')
+
+
+documentInfoNew <- documentInfo %>%
+  filter(X...PDF.file %in% listReadPDFs ) %>%
+  mutate(Language.of.document = tolower(Language.of.document)) 
+
+
+
+
+for (n in listReadPDFs) {
+
+  
+  # get name of document
+  nm <-  n
+  
+  # get name of country
+  country <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$country
+  year <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$year
+  document <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Title
+  language <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Language.of.document
+  
+  #select relevant data
+  text_df <- final_text_df %>%
+    filter(name==nm)
+  
+
+
+
+ #merge on key terms database
+  key_terms <- read_csv(paste(dir, '/Data/',language, '_keywords.csv', sep="")) %>%
+    mutate(keywords = str_to_lower(keywords),
+           original_keywords = str_to_lower(original_keywords)) %>%
+    distinct(keywords, topic, .keep_all = TRUE)
+  
+  #create grep search term for these keywords
+  keywords_grep<-paste(key_terms$keywords, collapse="|")
+  
+
+    terms_match <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted))
+   
+  text_match <- text_df %>%
+    filter(grepl(keywords_grep, sentence)) %>%
+    mutate(keywords_match=str_extract(sentence, keywords_grep)) %>%
+    group_by(keywords_match ) %>%
+    summarise(freq=n()) %>%
+    ungroup() %>%
+    arrange(desc(freq)) %>%
+    left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+    group_by(keywords_match ) %>%
+    summarise(across(everything(),first)) %>%
+    slice_max(freq, n=100)   
+
+  
+  
+  wdcld <- ggplot(text_match, aes(label=keywords_match, x=topic, y=freq, size=freq, colour = freq)) + 
+      geom_text_repel(segment.alpha = 0,
+                      direction = "y") +          # ggrepel geom, make arrows transparent, color by rank, size by n
+
+      scale_size_continuous(range = c(3, 10),   # set word size range & turn off legend
+                        guide = FALSE) +      
+      scale_color_gradient(low="green3", high="violetred",         # set color gradient,log transform & customize legend
+                       trans = "log10",
+                       guide = guide_colourbar(direction = "horizontal",
+                                               title.position ="top")) +
+      # scale_y_log10() +     # use log-scale for y-axis
+      scale_size_continuous(range = c(3, 10),         # set word size range & turn off legend
+                        guide = FALSE) +
+      ggtitle(paste('Word Cloud', country, year, document, sep=" - ")) +
+      labs(y = "Word frequency", x = "Topic Area") +
+      theme_minimal() + # minimal theme & customizations
+      theme(legend.position=c(.99, .99),
+        legend.justification = c("right","bottom"),
+        panel.grid.major = element_line(colour = "whitesmoke"),
+        axis.text.x = element_text(angle = 60))
+
+  print(wdcld)
+  
+      use_of_numbers_df <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted)) %>%
+      left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+      group_by(country, year, document, language, name, topic) %>%  
+      summarise(freq_of_terms = n(),
+                freq_of_numbers=mean(as.numeric(use_of_numbers))
+                ) 
+
+
+  numbers_plot <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    geom_text_repel(segment.alpha = 0.7) +
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) +
+    coord_equal()
+  
+    numbers_plot2 <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited (no labels)', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) +
+    coord_equal()
+  
+    print(numbers_plot)
+
+  }
+
+
+```
+---
+# Example sentence 1
+
+- The sentence in the document: "`r terms_match[91,]$sentence`" 
+- Contains the keyword: **`r terms_match[91,]$keywords_match`**   
+- Did the sentence use data according to model?: **`r terms_match[91,]$use_of_numbers`**   
+
+---
+
+# Example sentence 2
+
+- The sentence in the document: "`r terms_match[167,]$sentence`" 
+- Contains the keyword: **`r terms_match[167,]$keywords_match`**    
+- Did the sentence use data according to model?: **`r terms_match[167,]$use_of_numbers`**   
+
+
+---
+
+# Example sentence 3
+
+- The sentence in the document: "`r terms_match[432,]$sentence`" 
+- Contains the keyword: **`r terms_match[432,]$keywords_match`**    
+- Did the sentence use data according to model?: **`r terms_match[432,]$use_of_numbers`**   
+
+
+---
+
+# Example sentence 4
+
+- The sentence in the document: "`r terms_match[1132,]$sentence`" 
+- Contains the keyword: **`r terms_match[1132,]$keywords_match`**    
+- Did the sentence use data according to model?: **`r terms_match[1132,]$use_of_numbers`**   
+
+
+---
+
+# Example sentence 5
+
+- The sentence in the document: "`r terms_match[652,]$sentence`" 
+- Contains the keyword: **`r terms_match[652,]$keywords_match`**    
+- Did the sentence use data according to model?: **`r terms_match[652,]$use_of_numbers`**   
+
+
+---
+# Terms Usage & Data Mentions
+
+- Next, we will plot the number of times a topic was mentioned (on x-axis) against the of times statistics were cited according to our algorithm
+
+
+
+---
+
+.center3[
+
+```{r wordcloud, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot
+
+```
+
+]
+
+---
+
+.center3[
+
+```{r wordcloud2, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot2
+
+```
+
+]
+
+
+
+---
+
+
+```{r examples3, fig.height=14, fig.width=14, message=FALSE, warning=FALSE, include=FALSE}
+
+listReadPDFs = documentInfo$X...PDF.file
+
+listReadPDFs = c('gui151440.pdf')
+
+documentInfoNew <- documentInfo %>%
+  filter(X...PDF.file %in% listReadPDFs ) %>%
+  mutate(Language.of.document = tolower(Language.of.document)) 
+
+
+for (n in listReadPDFs) {
+
+  
+  # get name of document
+  nm <-  n
+  
+  # get name of country
+  country <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$country
+  year <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$year
+  document <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Title
+  language <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Language.of.document
+  
+  #select relevant data
+  text_df <- final_text_df %>%
+    filter(name==nm)
+  
+
+
+
+ #merge on key terms database
+  key_terms <- read_csv(paste(dir, '/Data/',language, '_keywords.csv', sep="")) %>%
+    mutate(keywords = str_to_lower(keywords),
+           original_keywords = str_to_lower(original_keywords)) %>%
+    distinct(keywords, topic, .keep_all = TRUE)
+  
+  #create grep search term for these keywords
+  keywords_grep<-paste(key_terms$keywords, collapse="|")
+  
+
+    terms_match <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted))
+   
+  text_match <- text_df %>%
+    filter(grepl(keywords_grep, sentence)) %>%
+    mutate(keywords_match=str_extract(sentence, keywords_grep)) %>%
+    group_by(keywords_match ) %>%
+    summarise(freq=n()) %>%
+    ungroup() %>%
+    arrange(desc(freq)) %>%
+    left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+    group_by(keywords_match ) %>%
+    summarise(across(everything(),first)) %>%
+    slice_max(freq, n=100)   
+
+  
+
+      use_of_numbers_df <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted)) %>%
+      left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+      group_by(country, year, document, language, name, topic) %>%  
+      summarise(freq_of_terms = n(),
+                freq_of_numbers=mean(as.numeric(use_of_numbers))
+                ) 
+
+
+  numbers_plot <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    geom_text_repel(segment.alpha = 0.7) +
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) 
+  
+
+
+}
+
+
+
+```
+
+.center3[
+
+```{r wordcloud3, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot
+
+```
+
+]
+
+---
+
+
+```{r examples4, fig.height=14, fig.width=14, message=FALSE, warning=FALSE, include=FALSE}
+
+listReadPDFs = documentInfo$X...PDF.file
+
+listReadPDFs = c('afg148215.pdf')
+
+documentInfoNew <- documentInfo %>%
+  filter(X...PDF.file %in% listReadPDFs ) %>%
+  mutate(Language.of.document = tolower(Language.of.document)) 
+
+
+for (n in listReadPDFs) {
+
+  
+  # get name of document
+  nm <-  n
+  
+  # get name of country
+  country <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$country
+  year <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$year
+  document <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Title
+  language <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Language.of.document
+  
+  #select relevant data
+  text_df <- final_text_df %>%
+    filter(name==nm)
+  
+
+
+
+ #merge on key terms database
+  key_terms <- read_csv(paste(dir, '/Data/',language, '_keywords.csv', sep="")) %>%
+    mutate(keywords = str_to_lower(keywords),
+           original_keywords = str_to_lower(original_keywords)) %>%
+    distinct(keywords, topic, .keep_all = TRUE)
+  
+  #create grep search term for these keywords
+  keywords_grep<-paste(key_terms$keywords, collapse="|")
+  
+
+    terms_match <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted))
+   
+  text_match <- text_df %>%
+    filter(grepl(keywords_grep, sentence)) %>%
+    mutate(keywords_match=str_extract(sentence, keywords_grep)) %>%
+    group_by(keywords_match ) %>%
+    summarise(freq=n()) %>%
+    ungroup() %>%
+    arrange(desc(freq)) %>%
+    left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+    group_by(keywords_match ) %>%
+    summarise(across(everything(),first)) %>%
+    slice_max(freq, n=100)   
+
+  
+
+      use_of_numbers_df <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted)) %>%
+      left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+      group_by(country, year, document, language, name, topic) %>%  
+      summarise(freq_of_terms = n(),
+                freq_of_numbers=mean(as.numeric(use_of_numbers))
+                ) 
+
+
+  numbers_plot <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    geom_text_repel(segment.alpha = 0.7) +
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) 
+  
+
+
+  }
+
+
+```
+
+.center3[
+
+```{r wordcloud4, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot
+
+```
+
+]
+
+---
+
+
+
+```{r examples5, fig.height=14, fig.width=14, message=FALSE, warning=FALSE, include=FALSE}
+
+listReadPDFs = documentInfo$X...PDF.file
+
+listReadPDFs = c('bra169705.pdf')
+
+documentInfoNew <- documentInfo %>%
+  filter(X...PDF.file %in% listReadPDFs ) %>%
+  mutate(Language.of.document = tolower(Language.of.document)) 
+
+
+
+for (n in listReadPDFs) {
+
+  
+  # get name of document
+  nm <-  n
+  
+  # get name of country
+  country <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$country
+  year <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$year
+  document <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Title
+  language <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Language.of.document
+  
+  #select relevant data
+  text_df <- final_text_df %>%
+    filter(name==nm)
+  
+
+
+
+ #merge on key terms database
+  key_terms <- read_csv(paste(dir, '/Data/',language, '_keywords.csv', sep="")) %>%
+    mutate(keywords = str_to_lower(keywords),
+           original_keywords = str_to_lower(original_keywords)) %>%
+    distinct(keywords, topic, .keep_all = TRUE)
+  
+  #create grep search term for these keywords
+  keywords_grep<-paste(key_terms$keywords, collapse="|")
+  
+
+    terms_match <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted))
+   
+  text_match <- text_df %>%
+    filter(grepl(keywords_grep, sentence)) %>%
+    mutate(keywords_match=str_extract(sentence, keywords_grep)) %>%
+    group_by(keywords_match ) %>%
+    summarise(freq=n()) %>%
+    ungroup() %>%
+    arrange(desc(freq)) %>%
+    left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+    group_by(keywords_match ) %>%
+    summarise(across(everything(),first)) %>%
+    slice_max(freq, n=100)   
+
+  
+
+      use_of_numbers_df <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted)) %>%
+      left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+      group_by(country, year, document, language, name, topic) %>%  
+      summarise(freq_of_terms = n(),
+                freq_of_numbers=mean(as.numeric(use_of_numbers))
+                ) 
+
+
+  numbers_plot <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    geom_text_repel(segment.alpha = 0.7) +
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) 
+  
+
+
+  }
+
+
+
+```
+
+.center3[
+
+```{r wordcloud5, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot
+
+```
+
+]
+
+---
+
+
+
+```{r examples6, fig.height=10, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+
+listReadPDFs = documentInfo$X...PDF.file
+
+listReadPDFs = c('tan166449.pdf')
+
+
+
+documentInfoNew <- documentInfo %>%
+  filter(X...PDF.file %in% listReadPDFs ) %>%
+  mutate(Language.of.document = tolower(Language.of.document)) 
+
+for (n in listReadPDFs) {
+
+  
+  # get name of document
+  nm <-  n
+  
+  # get name of country
+  country <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$country
+  year <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$year
+  document <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Title
+  language <- documentInfoNew[which(documentInfoNew$X...PDF.file==nm),]$Language.of.document
+  
+  #select relevant data
+  text_df <- final_text_df %>%
+    filter(name==nm)
+  
+
+
+
+ #merge on key terms database
+  key_terms <- read_csv(paste(dir, '/Data/',language, '_keywords.csv', sep="")) %>%
+    mutate(keywords = str_to_lower(keywords),
+           original_keywords = str_to_lower(original_keywords)) %>%
+    distinct(keywords, topic, .keep_all = TRUE)
+  
+  #create grep search term for these keywords
+  keywords_grep<-paste(key_terms$keywords, collapse="|")
+  
+
+    terms_match <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted))
+   
+  text_match <- text_df %>%
+    filter(grepl(keywords_grep, sentence)) %>%
+    mutate(keywords_match=str_extract(sentence, keywords_grep)) %>%
+    group_by(keywords_match ) %>%
+    summarise(freq=n()) %>%
+    ungroup() %>%
+    arrange(desc(freq)) %>%
+    left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+    group_by(keywords_match ) %>%
+    summarise(across(everything(),first)) %>%
+    slice_max(freq, n=100)   
+
+  
+
+      use_of_numbers_df <- text_df %>%
+      filter(grepl(keywords_grep, sentence)) %>%
+      mutate(keywords_match=str_extract(sentence, keywords_grep),
+             sentence_formatted=gsub(pattern = "[1][9][5-9][0-9]|[2][0][0-4][0-9]",replacement = "", sentence),
+             use_of_numbers=grepl("\\d", sentence_formatted)) %>%
+      left_join(key_terms, by =  c('keywords_match'='keywords')) %>%
+      group_by(country, year, document, language, name, topic) %>%  
+      summarise(freq_of_terms = n(),
+                freq_of_numbers=mean(as.numeric(use_of_numbers))
+                ) 
+
+
+  numbers_plot <- ggplot(use_of_numbers_df, aes(x=freq_of_terms, y=freq_of_numbers*freq_of_terms, color=topic, label=topic)) +
+    geom_point() + 
+    geom_text_repel(segment.alpha = 0.7) +
+    theme_minimal() +
+    ggtitle(str_wrap(paste('Statistics Cited per Topic Cited', country, year, document, sep=" - "), 90)) +
+    labs(y = "Frequency Statistic Cited", x = "Topic Frequency") +
+    theme(legend.position = "none",
+    panel.grid.major = element_line(colour = "whitesmoke")) +
+    geom_abline(slope=1, intercept=0) 
+  
+
+
+  }
+
+
+
+```
+
+.center3[
+
+```{r wordcloud6, echo=FALSE, fig.height=6, fig.width=8}
+
+numbers_plot
+
+```
+
+]
+
