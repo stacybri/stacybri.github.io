@@ -1,6 +1,7 @@
 ---
 title: "Brian Stacy"
 subtitle: "Senior Economist, World Bank"
+description: "Senior Economist at the World Bank working on the Human Capital Index Plus, statistical capacity, and development data. Research on measurement gaps, education, labor markets, nutrition, and poverty."
 toc: false
 listing:
   id: highlights
