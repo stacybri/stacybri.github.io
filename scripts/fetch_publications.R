@@ -2,9 +2,10 @@
 # ("featured in") into data/publications_auto.csv and data/citations_auto.csv
 # for publications.qmd and media.qmd to render.
 #
-# Matching logic mirrors ../cv/scripts/fetch_publications.R (same ORCID
-# whitelist + OpenAlex enrichment approach) - see that file's comments for
-# the reasoning behind simplifyDataFrame=FALSE and the fuzzy title match.
+# Matching logic mirrors ../cv/scripts/fetch_publications.R (ORCID + known-
+# institution matching against OpenAlex, plus Jaccard-based dedup) - see that
+# file's comments for the reasoning behind simplifyDataFrame=FALSE, the fuzzy
+# title match, and why ORCID alone isn't used as a strict whitelist.
 library(tidyverse)
 library(httr)
 library(jsonlite)
@@ -71,6 +72,8 @@ fetch_all_openalex_works <- function(url) {
 
 openalex_works <- fetch_all_openalex_works(works_api_url)
 
+known_institutions <- c("world bank", "usda", "economic research service", "michigan state")
+
 openalex_df <- map_dfr(openalex_works, function(w) {
   doi <- normalize_doi(w$doi)
   authorships <- w$authorships
@@ -79,11 +82,22 @@ openalex_df <- map_dfr(openalex_works, function(w) {
   } else {
     character(0)
   }
-  coauthors <- author_names[!str_detect(author_names, fixed("Stacy"))]
+  is_stacy <- str_detect(author_names, fixed("Stacy"))
+  coauthors <- author_names[!is_stacy]
   name_key <- map_chr(coauthors, ~ paste(sort(str_split(str_to_lower(.x), "[^a-z]+")[[1]]), collapse = " "))
   coauthors <- coauthors[!duplicated(name_key)]
   venue <- w$primary_location$source$display_name %||% NA_character_
   link <- w$doi %||% w$primary_location$landing_page_url %||% NA_character_
+  # Institutions listed against Brian's own authorship entry (fallback signal
+  # for works not yet registered on ORCID).
+  stacy_institutions <- if (any(is_stacy)) {
+    authorships[is_stacy] %>%
+      map(~ .x$institutions) %>%
+      unlist(recursive = FALSE) %>%
+      map_chr(~ .x$display_name %||% NA_character_)
+  } else {
+    character(0)
+  }
   tibble(
     openalex_id = w$id %||% NA_character_,
     title = w$title %||% NA_character_,
@@ -93,15 +107,19 @@ openalex_df <- map_dfr(openalex_works, function(w) {
     coauthors = paste(coauthors, collapse = ", "),
     cited_by_count = w$cited_by_count %||% 0,
     link = link,
-    type = w$type %||% NA_character_
+    type = w$type %||% NA_character_,
+    known_institution_match = length(stacy_institutions) > 0 &&
+      any(map_lgl(known_institutions, ~ any(str_detect(str_to_lower(stacy_institutions), fixed(.x)))))
   )
 })
 
 openalex_df <- openalex_df %>% filter(!type %in% c("dataset", "supplementary-materials"))
 
-# --- 3. Restrict to works Brian has self-registered on ORCID, matched by
-# DOI, falling back to normalized substring title match (see cv repo script
-# for why exact-title matching drops most real matches) ---
+# --- 3. Restrict to works that are plausibly Brian's own: matched against
+# his self-registered ORCID list (by DOI, falling back to normalized
+# substring title match), OR his own authorship entry lists one of his known
+# institutions - catches recent papers not yet added to ORCID (see cv repo
+# script for the fuller writeup of why ORCID-only matching drops legit work) ---
 norm_title <- function(x) {
   x %>% str_to_lower() %>% str_replace_all("[^a-z0-9 ]", " ") %>% str_squish()
 }
@@ -120,17 +138,41 @@ openalex_df <- openalex_df %>%
   )
 
 matched <- openalex_df %>%
-  filter((!is.na(doi) & doi %in% orcid_dois) | title_matches) %>%
+  filter((!is.na(doi) & doi %in% orcid_dois) | title_matches | known_institution_match) %>%
   distinct(title, .keep_all = TRUE)
 
+# Collapse near-duplicate records of the same paper (working paper suffix,
+# or a looser retitle between preprint and final version) via word-set
+# (Jaccard) similarity, keeping the most recent year (the final version).
 strip_wp_suffix <- function(t) str_remove(t, "\\s*working paper\\s*#?\\s*\\d*\\.?\\s*$")
+word_set <- function(t) unique(str_split(t, "\\s+")[[1]])
+jaccard_sim <- function(a, b) {
+  sa <- word_set(a); sb <- word_set(b)
+  length(intersect(sa, sb)) / length(union(sa, sb))
+}
+
+matched <- matched %>% mutate(dedup_key = strip_wp_suffix(norm_title))
+
+keys <- unique(matched$dedup_key)
+cluster_id <- setNames(seq_along(keys), keys)
+if (length(keys) > 1) {
+  for (i in seq_len(length(keys) - 1)) {
+    for (j in seq((i + 1), length(keys))) {
+      if (jaccard_sim(keys[i], keys[j]) > 0.75) {
+        old_id <- cluster_id[[keys[j]]]
+        new_id <- cluster_id[[keys[i]]]
+        cluster_id[cluster_id == old_id] <- new_id
+      }
+    }
+  }
+}
 
 matched <- matched %>%
-  mutate(dedup_key = strip_wp_suffix(norm_title)) %>%
-  group_by(dedup_key) %>%
+  mutate(cluster_id = cluster_id[dedup_key]) %>%
+  group_by(cluster_id) %>%
   slice_max(year, n = 1, with_ties = FALSE) %>%
   ungroup() %>%
-  select(-dedup_key)
+  select(-cluster_id, -dedup_key)
 
 # --- 4. Write publications_auto.csv -----------------------------------------
 publications_auto <- matched %>%

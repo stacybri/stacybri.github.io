@@ -3,6 +3,9 @@ title: "Brian Stacy"
 subtitle: "Economist / Data Scientist, World Bank"
 ---
 
+::: {layout="[25,75]"}
+![](images/headshot.jpg){.rounded}
+
 Brian Stacy is a Senior Economist in the Office of the Chief Economist for People at the
 World Bank. His current work focuses on the Human Capital Index Plus (HCI+), flagship
 reports on human development, and a minimum data package for children, adolescents, and
@@ -11,6 +14,7 @@ team in the World Bank's Development Data Group, co-leading the Statistical Perf
 Indicators project and contributing to the Atlas of Sustainable Development Goals and the
 World Development Indicators. He has also worked on the Global Education Policy Dashboard
 and Learning Poverty projects in the Education Global Practice.
+:::
 
 His research interests include measurement and data gaps, economics of education, labor
 markets, nutrition, and poverty. He holds a Ph.D. in Economics from Michigan State

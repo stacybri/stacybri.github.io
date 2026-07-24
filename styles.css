@@ -1,4 +1,7 @@
 /* minimal overrides on top of the cosmo theme */
+.rounded {
+  border-radius: 0.5rem;
+}
 .entry {
   margin-bottom: 1.5rem;
 }
