@@ -40,11 +40,26 @@ reports <- read_csv("data/wb_reports_auto.csv", show_col_types = FALSE) %>%
 all_pubs <- bind_rows(pubs, reports) %>%
   arrange(desc(sort_date))
 
+# Manually-maintained GitHub repo links for a handful of publications - kept
+# in a separate file (not touched by the fetch scripts) so they survive the
+# weekly auto-refresh of publications_auto.csv/wb_reports_auto.csv. Joined by
+# normalized title since punctuation/casing can differ slightly from source.
+norm_title <- function(x) x %>% str_to_lower() %>% str_replace_all("[^a-z0-9 ]", " ") %>% str_squish()
+
+repo_links <- read_csv("data/publication_repos.csv", show_col_types = FALSE) %>%
+  transmute(norm_title = norm_title(title), github_url)
+
+all_pubs <- all_pubs %>%
+  mutate(norm_title = norm_title(title)) %>%
+  left_join(repo_links, by = "norm_title") %>%
+  select(-norm_title)
+
 all_pubs %>%
   mutate(
     year = format(sort_date, "%Y"),
     link_md = ifelse(is.na(link), "", glue("[View]({link})")),
-    meta_line = str_trim(glue("{meta} {link_md}"))
+    code_md = ifelse(is.na(github_url), "", glue("[Code]({github_url})")),
+    meta_line = str_trim(glue("{meta} {link_md} {code_md}"))
   ) %>%
   glue_data(
     "<div class='entry'>\n\n",
