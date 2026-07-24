@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Brian Stacy</title>
+<link>https://stacybri.github.io/publications.html</link>
+<atom:link href="https://stacybri.github.io/publications.xml" rel="self" type="application/rss+xml"/>
+<description>Brian Stacy — Senior Economist at the World Bank. Research on measurement and data gaps, economics of education, labor markets, nutrition, and poverty.</description>
+<image>
+<url>https://stacybri.github.io/images/headshot.jpg</url>
+<title>Brian Stacy</title>
+<link>https://stacybri.github.io/publications.html</link>
+</image>
+<generator>quarto-1.10.18</generator>
+<lastBuildDate>Thu, 11 Jun 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Unlocking the Drivers of Learning for a Skilled Future : Insights from the Global Education Policy Dashboard</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>HCI Plus Methodology Note</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;a href=&#39;https://github.com/worldbank/HCI-Plus&#39;&gt;Code&lt;/a&gt;</description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 09 Feb 2026 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>2025 Update of the Statistical Performance Indicators: What is New?</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 24 Nov 2025 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Data use in social science and medical articles around the world</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;PNAS Nexus&lt;/em&gt; &amp;middot; Authored with Lucas Kitzmüller, Xiaoyu Wang, Daniel Gerszon Mahler, Umar Serajuddin.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Wed, 01 Jan 2025 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Missing SDG gender indicators</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;World Development&lt;/em&gt; &amp;middot; Authored with Kathleen Beegle, Umar Serajuddin, Divyanshi Wadhwa. &amp;middot; &lt;a href=&#39;https://github.com/stacybri/Missing-SDG-Gender-Indicators&#39;&gt;Code&lt;/a&gt;</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Wed, 01 Jan 2025 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>2024 Update of the Statistical Performance Indicators: What is New?</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 11 Nov 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Missing Evidence : Tracking Academic Data Use around the World</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;a href=&#39;https://github.com/stacybri/academic_data_use&#39;&gt;Code&lt;/a&gt;</description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Wed, 17 Jan 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Statistical Performance Indicators (SPI): Protocols for Quality Assurance</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Wed, 17 Jan 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Update of the Statistical Performance Indicators: What is New?</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Wed, 17 Jan 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Country statistical capacity: A recent assessment tool and further reflections on the way forward</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;Statistical Journal of the IAOS&lt;/em&gt; &amp;middot; Authored with Hai‐Anh Dang, Dean Jolliffe, Umar Serajuddin. &amp;middot; Cited by 1.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Reviewing Assessment Tools for Measuring Country Statistical Capacity</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;SSRN Electronic Journal&lt;/em&gt; &amp;middot; Authored with Hai‐Anh Dang, John Pullinger, Umar Serajuddin. &amp;middot; Cited by 1.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Statistical performance indicators and index—a new tool to measure country statistical capacity</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;Scientific Data&lt;/em&gt; &amp;middot; Authored with Hai‐Anh Dang, John Pullinger, Umar Serajuddin. &amp;middot; Cited by 33. &amp;middot; &lt;a href=&#39;https://github.com/worldbank/SPI&#39;&gt;Code&lt;/a&gt;</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Sun, 01 Jan 2023 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>The Role of Generic Price Look-Up Code in WIC Benefit Redemptions</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;Journal of Public Policy &amp; Marketing&lt;/em&gt; &amp;middot; Authored with Junzhou Zhang, Qi Zhang, Chuanyi Tang, Kayoung Park, Kristina Harrison, Patrick W. McLaughlin. &amp;middot; Cited by 6.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Sat, 01 Jan 2022 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Global Education Policy Dashboard : Technical Note</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 19 Apr 2021 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Measuring the Statistical Performance of Countries : An Overview of Updates to the World Bank Statistical Capacity Index</title>
+  <link>https://stacybri.github.io/</link>
+  <description></description>
+  <category>WB Report</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Thu, 18 Mar 2021 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Will Every Child be Able to Read by 2030? Defining Learning Poverty and Mapping the Dimensions of the Challenge</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;World Bank, Washington, DC eBooks&lt;/em&gt; &amp;middot; Authored with Diana Goldemberg, João Pedro Azevedo, Silvia Montoya, Reema Nayar, Halsey Rogers, Jaime Saavedra. &amp;middot; Cited by 26. &amp;middot; &lt;a href=&#39;https://github.com/worldbank/LearningPoverty&#39;&gt;Code&lt;/a&gt;</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Fri, 01 Jan 2021 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Women, Infants, and Children Cash Value Benefit Redemption Choices in the Electronic Benefit Transfer Era</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;American Journal of Health Promotion&lt;/em&gt; &amp;middot; Authored with Qi Zhang, Junzhou Zhang, Kayoung Park, Chuanyi Tang, Patrick W. McLaughlin. &amp;middot; Cited by 11.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Fri, 01 Jan 2021 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Comparing and assessing the consequences of two different approaches to measuring school effectiveness</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;Educational Assessment Evaluation and Accountability&lt;/em&gt; &amp;middot; Authored with Cassandra M. Guarino, Jeffrey M. Wooldridge. &amp;middot; Cited by 7.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Tue, 01 Jan 2019 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>The Supplemental Nutrition Assistance Program (SNAP) and the Economy: New Estimates of the SNAP Multiplier</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;AgEcon Search (University of Minnesota, USA)&lt;/em&gt; &amp;middot; Authored with Patrick Canning. &amp;middot; Cited by 13.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Tue, 01 Jan 2019 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Using a Policy Index To Capture Trends and Differences in State Administration of USDA&#39;s Supplemental Nutrition Assistance Program</title>
+  <link>https://stacybri.github.io/</link>
+  <description>&lt;em&gt;AgEcon Search (University of Minnesota, USA)&lt;/em&gt; &amp;middot; Authored with Laura Tiehen, D. Marquardt, Marquardt, David. &amp;middot; Cited by 19.</description>
+  <category>Journal Article</category>
+  <guid>https://stacybri.github.io/</guid>
+  <pubDate>Mon, 01 Jan 2018 00:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

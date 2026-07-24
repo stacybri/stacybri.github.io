@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Senior Economist at the World Bank working on the Human Capital Index Plus, statistical capacity, and development data. Research on measurement gaps, education, labor markets, nutrition, and poverty.">
 
 <title>Brian Stacy</title>
 <style>
@@ -36,6 +37,9 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./images/favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -45,7 +49,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6ac2aec46ad7f46b16024ee4409aa65c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-a15983b01d478aee5799ff43dab196c6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -73,16 +77,85 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-highlights .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-description","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-highlights'] = new List('listing-highlights', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Brian Stacy">
+<meta property="og:description" content="Senior Economist at the World Bank working on the Human Capital Index Plus, statistical capacity, and development data. Research on measurement gaps, education, labor markets, nutrition, and poverty.">
+<meta property="og:image" content="https://stacybri.github.io/images/headshot.jpg">
+<meta property="og:site_name" content="Brian Stacy">
+<meta property="og:image:alt" content="Brian Stacy">
+<meta name="twitter:title" content="Brian Stacy">
+<meta name="twitter:description" content="Senior Economist at the World Bank working on the Human Capital Index Plus, statistical capacity, and development data. Research on measurement gaps, education, labor markets, nutrition, and poverty.">
+<meta name="twitter:image" content="https://stacybri.github.io/images/headshot.jpg">
+<meta name="twitter:creator" content="@brianstacyecon">
+<meta name="twitter:image:alt" content="Brian Stacy">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed fullcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-md " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
@@ -109,7 +182,7 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./media.html"> 
-<span class="menu-text">Media &amp; Blogs</span></a>
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./cv.html"> 
@@ -118,22 +191,22 @@ ul.task-list li input[type="checkbox"] {
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="mailto:stacybw@gmail.com"> <i class="bi bi-envelope" role="img">
+    <a class="nav-link" href="mailto:stacybw@gmail.com"> <i class="bi bi-envelope" role="img" aria-label="Email">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/brianstacyecon"> <i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/brianstacyecon"> <i class="bi bi-twitter" role="img" aria-label="Twitter">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/stacybri"> <i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/stacybri"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://www.linkedin.com/in/brian-stacy-1a826076"> <i class="bi bi-linkedin" role="img">
+    <a class="nav-link" href="https://www.linkedin.com/in/brian-stacy-1a826076"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -155,9 +228,14 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Brian Stacy</h1>
-<p class="subtitle lead">Economist / Data Scientist, World Bank</p>
+<p class="subtitle lead">Senior Economist, World Bank</p>
 </div>
 
+<div>
+  <div class="description">
+    Senior Economist at the World Bank working on the Human Capital Index Plus, statistical capacity, and development data. Research on measurement gaps, education, labor markets, nutrition, and poverty.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -175,7 +253,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-layout-panel" data-layout="[25,75]">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 25.0%;justify-content: center;">
-<p><img src="images/headshot.jpg" class="rounded img-fluid"></p>
+<p><img src="images/headshot.jpg" class="headshot img-fluid" alt="Brian Stacy"></p>
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 75.0%;justify-content: flex-start;">
 <p>Brian Stacy is a Senior Economist in the Office of the Chief Economist for People at the World Bank. His current work focuses on the Human Capital Index Plus (HCI+), flagship reports on human development, and a minimum data package for children, adolescents, and youth. Previously, he served as a data scientist with the Indicators and Data Services team in the World Bank’s Development Data Group, co-leading the Statistical Performance Indicators project and contributing to the Atlas of Sustainable Development Goals and the World Development Indicators. He has also worked on the Global Education Policy Dashboard and Learning Poverty projects in the Education Global Practice.</p>
@@ -183,7 +261,123 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <p>His research interests include measurement and data gaps, economics of education, labor markets, nutrition, and poverty. He holds a Ph.D.&nbsp;in Economics from Michigan State University.</p>
-<p>Publications and media mentions on this site update automatically from <a href="https://orcid.org/0000-0002-3039-2004">ORCID</a>, <a href="https://openalex.org">OpenAlex</a>, and his <a href="https://www.worldbank.org/en/about/people/b/brian-william-stacy">World Bank staff profile</a> — see <a href="./publications.html">Publications</a> and <a href="./media.html">Media &amp; Blogs</a>.</p>
+<section id="selected-work" class="level2">
+<h2 class="anchored" data-anchor-id="selected-work">Selected work</h2>
+<div id="listing-highlights" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-categories="QXBw">
+<a href="https://www.worldbank.org/hciplus" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Human Capital Index Plus (HCI+)
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('QXBw'); return false;">App</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Interactive app exploring how health, education, and jobs shape lifetime earnings across countries. Current flagship work.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="1" data-categories="UGFwZXI=">
+<a href="https://doi.org/10.1038/s41597-023-01971-0" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Statistical Performance Indicators
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('UGFwZXI='); return false;">Paper</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>A new tool measuring the statistical capacity of national statistical systems worldwide. Published in Scientific Data, with code and data open.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="2" data-categories="UGFwZXI=">
+<a href="https://doi.org/10.1257/jep.31.4.185" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Enrollment without Learning: Teacher Effort, Knowledge, and Skill in Primary Schools in Africa
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('UGFwZXI='); return false;">Paper</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Journal of Economic Perspectives study of what teachers in Sub-Saharan Africa actually know and do in the classroom.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="3" data-categories="VmlzdWFsaXphdGlvbg==">
+<a href="https://data360.worldbank.org/en/atlas/learning-and-work/" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Atlas of Global Development: Learning and Work
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('VmlzdWFsaXphdGlvbg=='); return false;">Visualization</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Interactive chapter on how skills are built and used on the job, from the World Bank’s Atlas of Global Development.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="4" data-categories="UGFwZXI=">
+<a href="https://doi.org/10.1016/j.worlddev.2025.106957" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Missing SDG Gender Indicators
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('UGFwZXI='); return false;">Paper</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>World Development article on the large gaps in gender data reported against the Sustainable Development Goals.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="5" data-categories="UGFwZXI=">
+<a href="https://doi.org/10.1093/pnasnexus/pgaf196" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Data use in social science and medical articles around the world
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('UGFwZXI='); return false;">Paper</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>PNAS Nexus study tracking how national statistics are actually used in academic research worldwide.</p>
+</div>
+</div>
+</div></a>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div>
+<p>See all <a href="./publications.html">publications</a>, <a href="./portfolio.html">interactive visualizations</a>, and <a href="./media.html">blog posts</a>.</p>
+</section>
 <section id="contact" class="level2">
 <h2 class="anchored" data-anchor-id="contact">Contact</h2>
 <ul>
@@ -193,6 +387,7 @@ ul.task-list li input[type="checkbox"] {
 <li>LinkedIn: <a href="https://www.linkedin.com/in/brian-stacy-1a826076">brian-stacy-1a826076</a></li>
 <li>ORCID: <a href="https://orcid.org/0000-0002-3039-2004">0000-0002-3039-2004</a></li>
 </ul>
+
 
 
 </section>
@@ -271,7 +466,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/stacybri\.github\.io");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
