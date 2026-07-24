@@ -10,6 +10,8 @@ website:
         text: About
       - href: publications.qmd
         text: Publications
+      - href: portfolio.qmd
+        text: Portfolio
       - href: media.qmd
         text: Media & Blogs
       - href: cv.qmd

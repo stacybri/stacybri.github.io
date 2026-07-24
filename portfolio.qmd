@@ -1,0 +1,38 @@
+---
+title: "Portfolio"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, results = "asis", message = FALSE, warning = FALSE)
+library(tidyverse)
+library(glue)
+```
+
+Interactive data visualizations Brian has contributed to.
+
+```{r}
+portfolio <- read_csv("data/portfolio.csv", show_col_types = FALSE)
+
+portfolio %>%
+  mutate(
+    image_path = file.path("images/portfolio", image),
+    has_image = file.exists(image_path),
+    thumb_html = ifelse(
+      has_image,
+      glue("<img src='{image_path}' class='portfolio-thumb' alt='{title}'>"),
+      "<div class='portfolio-thumb portfolio-thumb-placeholder'></div>"
+    )
+  ) %>%
+  glue_data(
+    "<a class='portfolio-card' href='{url}' target='_blank' rel='noopener'>\n\n",
+    "{thumb_html}\n\n",
+    "<div class='portfolio-card-body'>\n\n",
+    "**{title}**\n\n",
+    "<span class='meta'>{description}</span>\n\n",
+    "</div>\n\n",
+    "</a>\n"
+  ) %>%
+  paste(collapse = "\n") %>%
+  {glue("<div class='portfolio-grid'>\n\n{.}\n\n</div>")} %>%
+  cat()
+```

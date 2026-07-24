@@ -23,3 +23,38 @@
   margin-left: 0.4rem;
   vertical-align: middle;
 }
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.portfolio-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+.portfolio-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+.portfolio-thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.portfolio-thumb-placeholder {
+  background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+}
+.portfolio-card-body {
+  padding: 0.75rem 1rem;
+}
+.portfolio-card-body .meta {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
