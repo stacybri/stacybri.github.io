@@ -1,0 +1,12 @@
+/* minimal overrides on top of the cosmo theme */
+.entry {
+  margin-bottom: 1.5rem;
+}
+.entry .venue {
+  color: #6c757d;
+  font-style: italic;
+}
+.entry .meta {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
