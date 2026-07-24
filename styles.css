@@ -30,6 +30,12 @@
   gap: 1.25rem;
   margin-top: 1rem;
 }
+.portfolio-grid > p {
+  /* pandoc wraps the whole card sequence in one <p> since there's no blank
+     line to mark it as a raw HTML block - make it invisible to grid layout
+     so its <a> children are still direct grid items. */
+  display: contents;
+}
 .portfolio-card {
   display: block;
   text-decoration: none;
@@ -49,9 +55,11 @@
   display: block;
 }
 .portfolio-thumb-placeholder {
+  display: block;
   background: linear-gradient(135deg, #e9ecef, #f8f9fa);
 }
 .portfolio-card-body {
+  display: block;
   padding: 0.75rem 1rem;
 }
 .portfolio-card-body .meta {
