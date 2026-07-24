@@ -1,10 +1,17 @@
 ---
 title: "CV"
+page-layout: full
+toc: false
 ---
 
-Brian's CV is maintained and auto-rendered in a separate repo
-([github.com/stacybri/cv](https://github.com/stacybri/cv)) so it can update itself weekly
-from ORCID/OpenAlex without touching this site.
+::: {.cv-actions}
+[Open in new tab](https://stacybri.github.io/cv/resume.html){.btn .btn-outline-secondary .btn-sm target="_blank"}
+[Download PDF](https://stacybri.github.io/cv/resume.pdf){.btn .btn-outline-secondary .btn-sm}
+:::
 
-- [View CV (HTML)](https://stacybri.github.io/cv/resume.html)
-- [Download CV (PDF)](https://stacybri.github.io/cv/resume.pdf)
+```{=html}
+<iframe class="cv-frame"
+        src="https://stacybri.github.io/cv/resume.html"
+        title="Brian Stacy's CV"
+        loading="lazy"></iframe>
+```

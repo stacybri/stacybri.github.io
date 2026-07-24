@@ -8,3 +8,7 @@
 
 # original full-res photo (source for images/headshot.jpg, too large to commit)
 images/030425-Brian Stacy-PR-017-F.jpg
+
+# build artifacts: regenerated from the CSVs by scripts/build_listings.R on
+# every render (see the pre-render step in _quarto.yml)
+data/*_listing.yml

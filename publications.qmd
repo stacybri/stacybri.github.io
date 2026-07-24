@@ -1,73 +1,41 @@
 ---
 title: "Publications"
+listing:
+  id: pubs
+  contents: data/publications_listing.yml
+  type: table
+  fields: [date, title, description, categories]
+  date-format: "YYYY"
+  sort: "date desc"
+  sort-ui: [date, title]
+  filter-ui: true
+  categories: true
+  page-size: 50
+  feed: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, results = "asis", message = FALSE, warning = FALSE)
-library(tidyverse)
-library(glue)
-```
-
-Journal articles, working papers, and official World Bank reports, refreshed weekly from
-[ORCID](https://orcid.org/0000-0002-3039-2004), [OpenAlex](https://openalex.org), and
-Brian's [World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy).
-Sorted by publication date, most recent first.
-
 ```{r}
-pubs <- read_csv("data/publications_auto.csv", show_col_types = FALSE) %>%
-  transmute(
-    title,
-    sort_date = as.Date(glue("{year}-01-01")),
-    kind = "Journal Article",
-    venue,
-    meta = glue(
-      "{ifelse(is.na(coauthors) | coauthors == '', '', paste0('Authored with ', coauthors, '. '))}",
-      "Cited by {cited_by_count} (OpenAlex)."
-    ),
-    link
-  )
-
-reports <- read_csv("data/wb_reports_auto.csv", show_col_types = FALSE) %>%
-  transmute(
-    title,
-    sort_date = date,
-    kind = "WB Report",
-    venue = type,
-    meta = "",
-    link = url
-  )
-
-all_pubs <- bind_rows(pubs, reports) %>%
-  arrange(desc(sort_date))
-
-# Manually-maintained GitHub repo links for a handful of publications - kept
-# in a separate file (not touched by the fetch scripts) so they survive the
-# weekly auto-refresh of publications_auto.csv/wb_reports_auto.csv. Joined by
-# normalized title since punctuation/casing can differ slightly from source.
-norm_title <- function(x) x %>% str_to_lower() %>% str_replace_all("[^a-z0-9 ]", " ") %>% str_squish()
-
-repo_links <- read_csv("data/publication_repos.csv", show_col_types = FALSE) %>%
-  transmute(norm_title = norm_title(title), github_url)
-
-all_pubs <- all_pubs %>%
-  mutate(norm_title = norm_title(title)) %>%
-  left_join(repo_links, by = "norm_title") %>%
-  select(-norm_title)
-
-all_pubs %>%
-  mutate(
-    year = format(sort_date, "%Y"),
-    link_md = ifelse(is.na(link), "", glue("[View]({link})")),
-    code_md = ifelse(is.na(github_url), "", glue("[Code]({github_url})")),
-    meta_line = str_trim(glue("{meta} {link_md} {code_md}"))
-  ) %>%
-  glue_data(
-    "<div class='entry'>\n\n",
-    "**{title}** ({year}) <span class='kind'>{kind}</span>\n\n",
-    "<span class='venue'>{venue}</span>\n\n",
-    "<span class='meta'>{meta_line}</span>\n\n",
-    "</div>\n"
-  ) %>%
-  paste(collapse = "\n") %>%
-  cat()
+#| echo: false
+#| results: asis
+#| message: false
+#| warning: false
+library(readr)
+library(glue)
+s <- read_csv("data/scholar_stats.csv", show_col_types = FALSE)
+# Author-level OpenAlex figures cover every work OpenAlex attributes to Brian,
+# which is a wider set than the curated list below - hence the attribution.
+glue(
+  "<p class='stat-line'>",
+  "<strong>{format(s$cited_by_count, big.mark = ',')}</strong> citations &middot; ",
+  "<strong>h-index {s$h_index}</strong> &middot; ",
+  "<strong>i10-index {s$i10_index}</strong> ",
+  "<span class='meta'>&mdash; all works, via OpenAlex</span>",
+  "</p>"
+) |> cat()
 ```
+
+Journal articles, working papers, and World Bank reports. Search the box below, sort by
+year or title, or filter by type.
+
+::: {#pubs}
+:::

@@ -1,29 +1,82 @@
 /* minimal overrides on top of the cosmo theme */
-.rounded {
+
+/* Deliberately not named .rounded - that collides with a Bootstrap utility
+   class. The img.headshot selector (0,1,1) is also needed to outrank the
+   .img-fluid max-width:100% that Quarto adds to every image. */
+.headshot {
   border-radius: 0.5rem;
 }
-.entry {
-  margin-bottom: 1.5rem;
-}
-.entry .venue {
-  color: #6c757d;
-  font-style: italic;
-}
-.entry .meta {
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-.entry .kind {
-  color: #6c757d;
-  font-size: 0.75rem;
-  font-weight: normal;
-  border: 1px solid #ced4da;
-  border-radius: 0.75rem;
-  padding: 0.05rem 0.5rem;
-  margin-left: 0.4rem;
-  vertical-align: middle;
+
+/* On narrow screens the 25/75 layout stacks, and an uncapped headshot fills
+   the column and pushes the bio entirely below the fold. */
+@media (max-width: 768px) {
+  img.headshot {
+    max-width: 180px;
+  }
 }
 
+/* ---- Publications: headline stats ---------------------------------------- */
+.stat-line {
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
+}
+.stat-line .meta {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+/* ---- Blog list ----------------------------------------------------------- */
+.blog-list > p {
+  /* same pandoc raw-HTML gotcha as .portfolio-grid below */
+  display: contents;
+}
+.blog-entry {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #eee;
+}
+.blog-entry a {
+  text-decoration: none;
+}
+.blog-entry a:hover {
+  text-decoration: underline;
+}
+.blog-date {
+  display: inline;
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+}
+.blog-desc {
+  display: block;
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+/* ---- CV embed ------------------------------------------------------------ */
+.cv-actions {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.cv-frame {
+  width: 100%;
+  max-width: 900px;
+  height: 1150px;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+@media (max-width: 768px) {
+  .cv-frame {
+    height: 700px;
+  }
+}
+
+/* ---- Portfolio cards ----------------------------------------------------- */
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

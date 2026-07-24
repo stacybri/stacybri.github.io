@@ -1,6 +1,6 @@
-# Pulls Brian's own publications (ORCID + OpenAlex) and works that cite them
-# ("featured in") into data/publications_auto.csv and data/citations_auto.csv
-# for publications.qmd and media.qmd to render.
+# Pulls Brian's own publications (ORCID + OpenAlex) into
+# data/publications_auto.csv, plus headline citation stats into
+# data/scholar_stats.csv, for publications.qmd to render.
 #
 # Matching logic mirrors ../cv/scripts/fetch_publications.R (ORCID + known-
 # institution matching against OpenAlex, plus Jaccard-based dedup) - see that
@@ -175,11 +175,13 @@ matched <- matched %>%
   select(-cluster_id, -dedup_key)
 
 # --- 4. Write publications_auto.csv -----------------------------------------
+# venue is left NA rather than "N/A" - the render side omits the field when
+# it's missing instead of printing a placeholder.
 publications_auto <- matched %>%
   transmute(
     title,
     year,
-    venue = coalesce(venue, "N/A"),
+    venue,
     coauthors,
     cited_by_count,
     link
@@ -189,33 +191,19 @@ publications_auto <- matched %>%
 write_csv(publications_auto, "data/publications_auto.csv", na = "")
 cat(glue("Wrote {nrow(publications_auto)} publications to data/publications_auto.csv\n"))
 
-# --- 5. "Featured in": works that cite Brian's papers, via OpenAlex ---------
-fetch_citing_works <- function(openalex_id) {
-  work_id <- str_extract(openalex_id, "W\\d+$")
-  if (is.na(work_id)) return(tibble())
-  resp <- GET(
-    "https://api.openalex.org/works",
-    query = list(filter = glue("cites:{work_id}"), `per-page` = 50, mailto = contact_email, sort = "publication_date:desc")
-  )
-  if (http_error(resp)) return(tibble())
-  page_json <- content(resp, as = "text", encoding = "UTF-8") %>% fromJSON(simplifyDataFrame = FALSE)
-  map_dfr(page_json$results, function(w) {
-    tibble(
-      citing_title = w$title %||% NA_character_,
-      citing_year = w$publication_year %||% NA_integer_,
-      citing_venue = w$primary_location$source$display_name %||% NA_character_,
-      citing_link = w$doi %||% w$primary_location$landing_page_url %||% NA_character_,
-      cites_stacy_paper = openalex_id
-    )
-  })
-}
+# --- 5. Headline stats for the Publications page ----------------------------
+# These come from the author endpoint already fetched in step 2, so this costs
+# no additional API calls. Author-level figures cover all works OpenAlex knows
+# about (more than the curated list rendered on the site), hence the explicit
+# attribution in the rendered stat line.
+stats <- author_json$summary_stats
+scholar_stats <- tibble(
+  works_count = author_json$works_count %||% NA_integer_,
+  cited_by_count = author_json$cited_by_count %||% NA_integer_,
+  h_index = stats$h_index %||% NA_integer_,
+  i10_index = stats$i10_index %||% NA_integer_,
+  retrieved = format(Sys.Date())
+)
 
-citations_auto <- matched %>%
-  pull(openalex_id) %>%
-  compact() %>%
-  map_dfr(fetch_citing_works) %>%
-  distinct(citing_title, .keep_all = TRUE) %>%
-  arrange(desc(citing_year))
-
-write_csv(citations_auto, "data/citations_auto.csv", na = "")
-cat(glue("Wrote {nrow(citations_auto)} citing works to data/citations_auto.csv\n"))
+write_csv(scholar_stats, "data/scholar_stats.csv", na = "")
+cat(glue("Wrote data/scholar_stats.csv ({scholar_stats$cited_by_count} citations, h-index {scholar_stats$h_index})\n"))

@@ -1,10 +1,22 @@
 project:
   type: website
   output-dir: _site
+  # regenerates data/*_listing.yml from the CSVs on every render, local and CI
+  pre-render: scripts/build_listings.R
 
 website:
   title: "Brian Stacy"
+  site-url: https://stacybri.github.io
+  description: "Brian Stacy — Senior Economist at the World Bank. Research on measurement and data gaps, economics of education, labor markets, nutrition, and poverty."
+  favicon: images/favicon.png
+  image: images/headshot.jpg
+  open-graph: true
+  twitter-card:
+    creator: "@brianstacyecon"
   navbar:
+    # default breakpoint (lg/992px) hid the whole nav behind a hamburger on
+    # tablets and small laptops
+    collapse-below: md
     left:
       - href: index.qmd
         text: About
@@ -13,21 +25,29 @@ website:
       - href: portfolio.qmd
         text: Portfolio
       - href: media.qmd
-        text: Media & Blogs
+        text: Blog
       - href: cv.qmd
         text: CV
     right:
       - icon: envelope
         href: mailto:stacybw@gmail.com
+        aria-label: Email
       - icon: twitter
         href: https://twitter.com/brianstacyecon
+        aria-label: Twitter
       - icon: github
         href: https://github.com/stacybri
+        aria-label: GitHub
       - icon: linkedin
         href: https://www.linkedin.com/in/brian-stacy-1a826076
+        aria-label: LinkedIn
 
 format:
   html:
     theme: cosmo
     css: styles.css
-    toc: false
+    toc: true
+    toc-location: right
+    grid:
+      body-width: 900px
+      margin-width: 300px

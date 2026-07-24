@@ -1,6 +1,5 @@
 ---
-title: "Media & Blogs"
-df-print: paged
+title: "Blog Posts"
 ---
 
 ```{r setup, include=FALSE}
@@ -9,43 +8,34 @@ library(tidyverse)
 library(glue)
 ```
 
-## World Bank blog posts
-
-Refreshed weekly from Brian's [World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy).
+Posts written for the World Bank's blogs, most recent first.
 
 ```{r}
 blogs <- read_csv("data/wb_blogs_auto.csv", show_col_types = FALSE) %>%
   arrange(desc(date))
 
+# Keep every fragment on one newline-joined line with no blank lines: a blank
+# line makes pandoc split the raw HTML into separate paragraphs and emit stray
+# empty <p> elements (same gotcha handled in portfolio.qmd).
 blogs %>%
   mutate(
     date_str = format(date, "%B %Y"),
-    link_md = ifelse(is.na(url), "", glue("[Read]({url})"))
+    title_html = ifelse(
+      is.na(url),
+      glue("<strong>{title}</strong>"),
+      glue("<a href='{url}'><strong>{title}</strong></a>")
+    ),
+    desc_html = ifelse(is.na(description), "", glue("<span class='blog-desc'>{description}</span>"))
   ) %>%
   glue_data(
-    "<div class='entry'>\n\n",
-    "**{title}** — {date_str}\n\n",
-    "<span class='meta'>{link_md}</span>\n\n",
-    "</div>\n"
+    "<div class='blog-entry'>",
+    "{title_html}",
+    "<span class='blog-date'>{date_str}</span>",
+    "{desc_html}",
+    "</div>",
+    .sep = ""
   ) %>%
   paste(collapse = "\n") %>%
+  {glue("<div class='blog-list'>\n{.}\n</div>")} %>%
   cat()
-```
-
-## Featured in
-
-Works that cite Brian's publications, via [OpenAlex](https://openalex.org). Sortable/searchable table.
-
-```{r}
-#| results: markup
-citations <- read_csv("data/citations_auto.csv", show_col_types = FALSE) %>%
-  transmute(
-    Title = citing_title,
-    Year = citing_year,
-    Venue = citing_venue,
-    Link = citing_link
-  ) %>%
-  arrange(desc(Year))
-
-citations
 ```
