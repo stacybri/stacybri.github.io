@@ -8,49 +8,49 @@ library(tidyverse)
 library(glue)
 ```
 
-Journal articles and working papers, refreshed weekly from
-[ORCID](https://orcid.org/0000-0002-3039-2004) and [OpenAlex](https://openalex.org).
-Official World Bank reports and working papers are pulled separately from Brian's
-[World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy).
-
-## Journal articles & working papers
+Journal articles, working papers, and official World Bank reports, refreshed weekly from
+[ORCID](https://orcid.org/0000-0002-3039-2004), [OpenAlex](https://openalex.org), and
+Brian's [World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy).
+Sorted by publication date, most recent first.
 
 ```{r}
 pubs <- read_csv("data/publications_auto.csv", show_col_types = FALSE) %>%
-  arrange(desc(year))
+  transmute(
+    title,
+    sort_date = as.Date(glue("{year}-01-01")),
+    kind = "Journal Article",
+    venue,
+    meta = glue(
+      "{ifelse(is.na(coauthors) | coauthors == '', '', paste0('Authored with ', coauthors, '. '))}",
+      "Cited by {cited_by_count} (OpenAlex)."
+    ),
+    link
+  )
 
-pubs %>%
-  mutate(
-    authored_with = ifelse(is.na(coauthors) | coauthors == "", "", glue("Authored with {coauthors}.")),
-    cited = glue("Cited by {cited_by_count} (OpenAlex)"),
-    link_md = ifelse(is.na(link), "", glue("[View]({link})"))
-  ) %>%
-  glue_data(
-    "<div class='entry'>\n\n",
-    "**{title}** ({year})\n\n",
-    "<span class='venue'>{venue}</span>\n\n",
-    "<span class='meta'>{authored_with} {cited}. {link_md}</span>\n\n",
-    "</div>\n"
-  ) %>%
-  paste(collapse = "\n") %>%
-  cat()
-```
-
-## World Bank reports
-
-```{r}
 reports <- read_csv("data/wb_reports_auto.csv", show_col_types = FALSE) %>%
-  arrange(desc(date))
+  transmute(
+    title,
+    sort_date = date,
+    kind = "WB Report",
+    venue = type,
+    meta = "",
+    link = url
+  )
 
-reports %>%
+all_pubs <- bind_rows(pubs, reports) %>%
+  arrange(desc(sort_date))
+
+all_pubs %>%
   mutate(
-    year = format(date, "%Y"),
-    link_md = ifelse(is.na(url), "", glue("[View]({url})"))
+    year = format(sort_date, "%Y"),
+    link_md = ifelse(is.na(link), "", glue("[View]({link})")),
+    meta_line = str_trim(glue("{meta} {link_md}"))
   ) %>%
   glue_data(
     "<div class='entry'>\n\n",
-    "**{title}** ({year})\n\n",
-    "<span class='meta'>{type}. {link_md}</span>\n\n",
+    "**{title}** ({year}) <span class='kind'>{kind}</span>\n\n",
+    "<span class='venue'>{venue}</span>\n\n",
+    "<span class='meta'>{meta_line}</span>\n\n",
     "</div>\n"
   ) %>%
   paste(collapse = "\n") %>%

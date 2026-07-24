@@ -10,3 +10,13 @@
   color: #6c757d;
   font-size: 0.9rem;
 }
+.entry .kind {
+  color: #6c757d;
+  font-size: 0.75rem;
+  font-weight: normal;
+  border: 1px solid #ced4da;
+  border-radius: 0.75rem;
+  padding: 0.05rem 0.5rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
