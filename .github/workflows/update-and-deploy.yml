@@ -1,0 +1,54 @@
+name: Update data and deploy site
+
+on:
+  schedule:
+    - cron: "0 13 * * 1" # weekly, Monday 13:00 UTC (after the CV repo's job)
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::tidyverse
+            any::httr
+            any::jsonlite
+            any::glue
+            any::rvest
+
+      - name: Fetch publications, citations, WB reports & blogs
+        run: |
+          Rscript scripts/fetch_publications.R
+          Rscript scripts/fetch_wb_profile.R
+
+      - name: Commit data if anything changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update site data [skip ci]"
+          file_pattern: "data/*.csv"
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render site
+        run: quarto render
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site

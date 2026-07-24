@@ -1,0 +1,51 @@
+---
+title: "Media & Blogs"
+df-print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, results = "asis", message = FALSE, warning = FALSE)
+library(tidyverse)
+library(glue)
+```
+
+## World Bank blog posts
+
+Refreshed weekly from Brian's [World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy).
+
+```{r}
+blogs <- read_csv("data/wb_blogs_auto.csv", show_col_types = FALSE) %>%
+  arrange(desc(date))
+
+blogs %>%
+  mutate(
+    date_str = format(date, "%B %Y"),
+    link_md = ifelse(is.na(url), "", glue("[Read]({url})"))
+  ) %>%
+  glue_data(
+    "<div class='entry'>\n\n",
+    "**{title}** — {date_str}\n\n",
+    "<span class='meta'>{link_md}</span>\n\n",
+    "</div>\n"
+  ) %>%
+  paste(collapse = "\n") %>%
+  cat()
+```
+
+## Featured in
+
+Works that cite Brian's publications, via [OpenAlex](https://openalex.org). Sortable/searchable table.
+
+```{r}
+#| results: markup
+citations <- read_csv("data/citations_auto.csv", show_col_types = FALSE) %>%
+  transmute(
+    Title = citing_title,
+    Year = citing_year,
+    Venue = citing_venue,
+    Link = citing_link
+  ) %>%
+  arrange(desc(Year))
+
+citations
+```

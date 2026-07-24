@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Brian Stacy"
+  navbar:
+    left:
+      - href: index.qmd
+        text: About
+      - href: publications.qmd
+        text: Publications
+      - href: media.qmd
+        text: Media & Blogs
+      - href: cv.qmd
+        text: CV
+    right:
+      - icon: envelope
+        href: mailto:stacybw@gmail.com
+      - icon: twitter
+        href: https://twitter.com/brianstacyecon
+      - icon: github
+        href: https://github.com/stacybri
+      - icon: linkedin
+        href: https://www.linkedin.com/in/brian-stacy-1a826076
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: false

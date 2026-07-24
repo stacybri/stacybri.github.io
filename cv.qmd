@@ -1,0 +1,10 @@
+---
+title: "CV"
+---
+
+Brian's CV is maintained and auto-rendered in a separate repo
+([github.com/stacybri/cv](https://github.com/stacybri/cv)) so it can update itself weekly
+from ORCID/OpenAlex without touching this site.
+
+- [View CV (HTML)](https://stacybri.github.io/cv/resume.html)
+- [Download CV (PDF)](https://stacybri.github.io/cv/resume.pdf)

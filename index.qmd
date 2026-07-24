@@ -1,0 +1,30 @@
+---
+title: "Brian Stacy"
+subtitle: "Economist / Data Scientist, World Bank"
+---
+
+Brian Stacy is a Senior Economist in the Office of the Chief Economist for People at the
+World Bank. His current work focuses on the Human Capital Index Plus (HCI+), flagship
+reports on human development, and a minimum data package for children, adolescents, and
+youth. Previously, he served as a data scientist with the Indicators and Data Services
+team in the World Bank's Development Data Group, co-leading the Statistical Performance
+Indicators project and contributing to the Atlas of Sustainable Development Goals and the
+World Development Indicators. He has also worked on the Global Education Policy Dashboard
+and Learning Poverty projects in the Education Global Practice.
+
+His research interests include measurement and data gaps, economics of education, labor
+markets, nutrition, and poverty. He holds a Ph.D. in Economics from Michigan State
+University.
+
+Publications and media mentions on this site update automatically from
+[ORCID](https://orcid.org/0000-0002-3039-2004), [OpenAlex](https://openalex.org), and his
+[World Bank staff profile](https://www.worldbank.org/en/about/people/b/brian-william-stacy)
+— see [Publications](publications.qmd) and [Media & Blogs](media.qmd).
+
+## Contact
+
+- Email: [stacybw@gmail.com](mailto:stacybw@gmail.com)
+- Twitter: [@brianstacyecon](https://twitter.com/brianstacyecon)
+- GitHub: [github.com/stacybri](https://github.com/stacybri)
+- LinkedIn: [brian-stacy-1a826076](https://www.linkedin.com/in/brian-stacy-1a826076)
+- ORCID: [0000-0002-3039-2004](https://orcid.org/0000-0002-3039-2004)
